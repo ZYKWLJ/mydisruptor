@@ -23,10 +23,9 @@ public class Test {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int i = 0;
                 while (true) {
                     try {
-                        queue.take(i++);
+                        queue.take();
                         Thread.sleep(200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();

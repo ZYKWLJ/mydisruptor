@@ -11,21 +11,28 @@ public class ArrayBlockingQueue<E> {
     }
 
     // 存数据，不限时阻塞
-    public void put(E e) throws InterruptedException {
+    public synchronized void put(E e) throws InterruptedException {
         while (count == items.length) {
-            System.out.println("如果队列满了，生产者线程就在此阻塞");
+            System.out.println("队列满了，生产者线程就在此阻塞");
+            // 队列满了，生产者线程等待
+            wait();
         }
-        System.out.println("队列有位置了，生产者线程在此被唤醒，继续执行把数据放入数组中");
+        System.out.println("队列有位置了，生产者线程在此被唤醒，继续执行把数据放入数组中,入队列: "+e);
         enqueue(e);// 数据入列
+        notifyAll();
     }
 
     // 取数据，不限时阻塞
-    public E take(E e) throws InterruptedException {
+    public synchronized E take() throws InterruptedException {
         while (count ==0) {
-            System.out.println("如果队列空了，消费者线程就在此阻塞");
+            System.out.println("队列空了，消费者线程就在此阻塞");
+            // 队列空了，消费者线程等待生产者生产
+            wait();
         }
-        System.out.println("队列有数据了，消费线程在此被唤醒，继续执行从数组中取数据");
-        return dequeue();// 取出数据
+        E e=dequeue();
+        System.out.println("队列有数据了，消费线程在此被唤醒，继续执行从数组中取数据入队列: "+e);
+        notifyAll();
+        return e;// 取出数据
     }
 
     private void enqueue(E e) {
